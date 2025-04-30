@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-container" id="login-form">
+            <h2>Đăng Nhập</h2>
+            <form id="loginForm" class="login-form">
+                <input type="text" id="login-username" class="form-input" placeholder="Tên người dùng" required>
+                <div class="input-group">
+                    <input type="password" id="login-password" class="form-input" placeholder="Mật khẩu" required>
+                    <span class="toggle-password" onclick="togglePassword('login-password', this)">👁️</span>
+                </div>
+                <button type="submit" class="form-button">Đăng nhập</button>
+                <p>Chưa có tài khoản? <a href="#" onclick="showRegister()">Đăng ký</a></p>
+                <p style="text-align: center;">
+                    <a href="/forgot.html">Quên mật khẩu?</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div class="form-container hidden" id="register-form">
+            <h2>Đăng Ký</h2>
+            <form id="registerForm" class="register-form">
+                <input type="text" id="register-username" class="form-input" placeholder="Tên người dùng" required>
+                <input type="email" id="register-email" class="form-input" placeholder="Email" required>
+                <div class="input-group">
+                    <input type="password" id="register-password" class="form-input" placeholder="Mật khẩu" required>
+                    <span class="toggle-password" onclick="togglePassword('register-password', this)">👁️</span>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirm-password" class="form-input" placeholder="Nhập lại mật khẩu"
+                        required>
+                    <span class="toggle-password" onclick="togglePassword('confirm-password', this)">👁️</span>
+                </div>
+                <div id="strength-meter">
+                    <div id="strength-bar"></div>
+                </div>
+                <p id="strength-text">Độ mạnh: 0%</p>
+                <button type="submit" class="form-button">Đăng ký</button>
+                <p>Đã có tài khoản? <a href="#" onclick="showLogin()">Đăng nhập</a></p>
+            </form>
+        </div>
+
+        <div id="popup" class="popup hidden">
+            <p id="popup-message"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

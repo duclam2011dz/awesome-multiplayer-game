@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Battle Eagle - Menu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="menu-container">
+        <h1>🦅 Battle Eagle</h1>
+        <input type="text" id="player-name" placeholder="Nhập tên ingame của bạn" class="form-input">
+        <button onclick="startGame()" class="form-button">Play</button>
+    </div>
+    <script>
+        function startGame() {
+            const name = document.getElementById('player-name').value.trim();
+            if (!name) return alert('Vui lòng nhập tên ingame!');
+            localStorage.setItem('playerName', name);
+            window.location.href = '/game.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quên mật khẩu</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            padding-top: 60px;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        .box input {
+            width: 92%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .box button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        #msg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            width: 92%;
+            padding-right: 10px;
+        }
+
+        .toggle-eye {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-75%);
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <h2>Quên mật khẩu</h2>
+        <input type="text" id="fp-username" placeholder="Tên đăng nhập">
+        <input type="email" id="fp-email" placeholder="Email đăng ký">
+        <div class="password-wrapper">
+            <input type="password" id="fp-newpass" placeholder="Mật khẩu mới">
+            <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+        </div>
+        <button onclick="forgotPassword()">Gửi OTP</button>
+        <div id="msg"></div>
+    </div>
+
+    <script>
+        async function forgotPassword() {
+            const username = document.getElementById('fp-username').value.trim();
+            const email = document.getElementById('fp-email').value.trim();
+            const newpass = document.getElementById('fp-newpass').value;
+            const msg = document.getElementById('msg');
+
+            if (calculateStrength(newpass) < 50) {
+                msg.textContent = 'Mật khẩu quá yếu. Hãy chọn mật khẩu mạnh hơn.';
+                return;
+            }
+
+            const res = await fetch('/api/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, newpass })
+            });
+
+
+            const data = await res.json();
+            msg.style.color = data.success ? 'green' : 'red';
+            msg.textContent = data.message;
+
+            if (data.success) {
+                localStorage.setItem('otpType', 'reset');
+                localStorage.setItem('resetEmail', email);
+                localStorage.setItem('resetUsername', username);
+                setTimeout(() => window.location.href = '/otp.html', 1500);
+            }
+        }
+
+        function calculateStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score += 20;
+            if (/[A-Z]/.test(password)) score += 20;
+            if (/[a-z]/.test(password)) score += 20;
+            if (/[0-9]/.test(password)) score += 20;
+            if (/[^A-Za-z0-9]/.test(password)) score += 20;
+            return score;
+        }
+
+        function togglePassword() {
+            const input = document.getElementById('fp-newpass');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+
+</html>

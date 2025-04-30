@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Xác thực OTP</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+        }
+
+        .otp-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .otp-input {
+            font-size: 24px;
+            text-align: center;
+            width: 150px;
+            letter-spacing: 10px;
+            padding: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="otp-container">
+        <h2>Nhập mã OTP</h2>
+        <input id="otp" maxlength="6" class="otp-input" placeholder="------">
+        <br>
+        <button onclick="verifyOTP()">Xác nhận</button>
+        <p id="otp-msg" style="margin-top: 10px; color: red;"></p>
+        <button onclick="resendOTP()" style="margin-top: 10px;">Gửi lại OTP</button>
+    </div>
+
+    <script>
+        async function verifyOTP() {
+            const otp = document.getElementById('otp').value;
+            const email = localStorage.getItem('resetEmail') || localStorage.getItem('pendingEmail');
+            const username = localStorage.getItem('resetUsername');
+            const type = localStorage.getItem('otpType'); // "reset" hoặc "register"
+            const msg = document.getElementById('otp-msg');
+
+            if (!email || !type || (type === 'reset' && !username)) {
+                window.location.href = type === 'reset' ? '/forgot.html' : '/';
+                return;
+            }
+
+            const res = await fetch('/api/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp, username, type })
+            });
+
+            const data = await res.json();
+            msg.style.color = data.success ? 'green' : 'red';
+            msg.textContent = data.message;
+
+            if (data.success) {
+                msg.style.color = 'green';
+                msg.textContent = data.message;
+                localStorage.removeItem('resetEmail');
+                localStorage.removeItem('resetUsername');
+                localStorage.removeItem('otpType');
+                setTimeout(() => window.location.href = '/', 1500);
+            } else {
+                msg.style.color = 'red';
+                msg.textContent = data.message;
+                if (data.expired) {
+                    msg.innerHTML += '<br>Vui lòng nhấn <b>Gửi lại OTP</b> để nhận mã mới.';
+                }
+            }
+        }
+
+        async function resendOTP() {
+            const email = localStorage.getItem('resetEmail') || localStorage.getItem('pendingEmail');
+            const username = localStorage.getItem('resetUsername');
+            const type = localStorage.getItem('otpType');
+            const msg = document.getElementById('otp-msg');
+
+            if (!email || !type) {
+                msg.textContent = 'Thiếu thông tin. Vui lòng quay lại bước trước.';
+                return;
+            }
+
+            let res;
+            if (type === 'reset') {
+                res = await fetch('/api/resend-reset-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, username })
+                });
+            } else if (type === 'register') {
+                res = await fetch('/api/resend-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+            } else {
+                msg.textContent = 'Loại xác thực không hợp lệ.';
+                return;
+            }
+
+            const data = await res.json();
+            msg.style.color = data.success ? 'green' : 'red';
+            msg.textContent = data.message;
+        }
+    </script>
+</body>
+
+</html>
