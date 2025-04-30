@@ -33,7 +33,7 @@ Tích hợp hệ thống xác thực người dùng hiện đại với OTP, b�
 
 ```bash
 # Clone project
-git clone https://github.com/your-username/awesome-multiplayer-game.git
+git clone [https://github.com/your-username/awesome-multiplayer-game.git](https://github.com/duclam2011dz/awesome-multiplayer-game.git)
 cd awesome-multiplayer-game
 
 # Cài đặt dependencies
